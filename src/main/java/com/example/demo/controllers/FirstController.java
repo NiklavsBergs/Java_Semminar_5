@@ -54,7 +54,22 @@ public class FirstController {
 			}
 		}
 		
-		model.addAttribute("packet-error", "Wrong ID");
+		model.addAttribute("packetError", "Wrong ID");
+		return "error-page";//will show error-page.html
+	}
+	
+	@GetMapping("/all-products/{id}")//localhost:8080/one-product
+	public String findProductsById (@PathVariable("id") long id, Model model) {
+		if(id>0) {
+			for(Product temp : allProducts) {
+				if(temp.getId() == id) {
+					model.addAttribute("packet", temp);
+					return "one-product-page";
+				}
+			}
+		}
+		
+		model.addAttribute("packetError", "Wrong ID");
 		return "error-page";//will show error-page.html
 	}
 
