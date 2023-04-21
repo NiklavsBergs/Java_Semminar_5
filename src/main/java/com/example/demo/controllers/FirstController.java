@@ -86,4 +86,39 @@ public class FirstController {
 		allProducts.add(newProduct);
 		return "redirect:/all-products";
 	}
+	
+	@GetMapping("/edit-product/{id}")
+	public String editProductsById (@PathVariable("id") long id, Model model) {
+		if(id>0) {
+			for(Product temp : allProducts) {
+				if(temp.getId() == id) {
+					model.addAttribute("product", temp);
+					return "edit-product-page";
+				}
+			}
+		}
+		
+		model.addAttribute("packetError", "Wrong ID");
+		return "error-page";//will show error-page.html
+	}
+	
+	@PostMapping("/edit-product/{id}")
+	public String postEditProductFunc(@PathVariable("id") long id, Product product) {
+		for(Product temp : allProducts) {
+			if(temp.getId() == id) {
+				temp.setTitle(product.getTitle());
+				temp.setDescription(product.getDescription());
+				temp.setPrice(product.getPrice());
+				temp.setQuantity(product.getQuantity());
+				return "redirect:/all-products/" + id;
+			}
+		}
+		return "redirect:/error";
+	}
+	
+	@GetMapping("/error")
+	public String getErrorFunc(Model model) {
+		model.addAttribute("packetError", "Wrong id");
+		return "error-page";
+	}
 }
