@@ -6,5 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class ProductController {
-	
+	@GetMapping("/products") //localhost:8080/hello
+	public String getProducts() {
+		
+		return "products-page"; //there will be hello-page.html
+	}
 }
