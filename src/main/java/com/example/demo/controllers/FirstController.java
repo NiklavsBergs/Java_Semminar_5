@@ -4,6 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.demo.models.Product;
@@ -73,4 +74,16 @@ public class FirstController {
 		return "error-page";//will show error-page.html
 	}
 
+	@GetMapping("/add-product")
+	public String getAddProductFunc(Model model) {
+		model.addAttribute("product", new Product());
+		return "add-product-page";
+	}
+	
+	@PostMapping("/add-product")
+	public String postAddProductFunc(Product product) {
+		Product newProduct = new Product(product.getTitle(), product.getDescription(), product.getPrice(), product.getQuantity());
+		allProducts.add(newProduct);
+		return "redirect:/all-products";
+	}
 }

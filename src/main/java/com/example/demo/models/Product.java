@@ -18,7 +18,7 @@ public class Product {
 		setId();
 	}
 	
-	
+	public Product() {}
 	
 	public long getId() {
 		return id;
