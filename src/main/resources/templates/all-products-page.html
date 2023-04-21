@@ -1,12 +1,15 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 	<body>
-		<p th:text="${packet.getId()}"></p>
-		<p th:text="${packet.getTitle()}"></p>
-		<p th:text="${packet.getDescription()}"></p>
-		<p th:text="${packet.getPrice()}"></p>
-		<p th:text="${packet.getQuantity()}"></p>
-		<p th:text="${packet.toString()}"></p>
+		<table>
+			<tr th:each="temp : ${packet}">
+				<td th:text="${temp.getId()}"> </td> 		
+				<td th:text="${temp.getTitle()}"> </td> 
+				<td th:text="${temp.getDescription()}"> </td> 
+				<td th:text="${temp.getPrice()}"></td> 	
+				<td th:text="${temp.getQuantity()}"></td> 	
+			</tr>
+		</table>
 	</body>
 
 </html>
