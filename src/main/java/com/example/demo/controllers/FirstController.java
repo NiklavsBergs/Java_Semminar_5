@@ -92,17 +92,17 @@ public class FirstController {
 	
 	@GetMapping("/edit-product/{id}")
 	public String editProductsById (@PathVariable("id") long id, Model model) {
-		if(id>0) {
-			for(Product temp : CRUDservice.getProducts()) {
-				if(temp.getId() == id) {
-					model.addAttribute("product", temp);
-					return "edit-product-page";
-				}
-			}
+		try {
+			Product prod = CRUDservice.getProductById(id);
+			model.addAttribute("product", prod);
+			return "edit-product-page";
+		}
+		catch(Exception e){
+			model.addAttribute("packetError", e.getMessage());
+			return "error-page";//will show error-page.html
 		}
 		
-		model.addAttribute("packetError", "Wrong ID");
-		return "error-page";//will show error-page.html
+		
 	}
 	
 	@PostMapping("/edit-product/{id}")
@@ -130,11 +130,11 @@ public class FirstController {
 		
 		try {
 		CRUDservice.deleteById(id);
-		
+		model.addAttribute("packet", CRUDservice.getProducts());
 		return "/all-products-page";
 		}
 		catch(Exception e) {
-			model.addAttribute("packetError", "Wrong ID at delete");
+			model.addAttribute("packetError", e.getMessage());
 			e.printStackTrace();
 			return "error-page";//will show error-page.html
 		}
