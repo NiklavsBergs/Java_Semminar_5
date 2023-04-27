@@ -1,5 +1,6 @@
 package com.example.demo.controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,16 +9,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.demo.models.Product;
+import com.example.demo.services.ICRUDProductService;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
 @Controller
 public class FirstController {
 	
-	private ArrayList<Product> allProducts = new ArrayList<>(Arrays.asList(
-			new Product("Opel", "black", 1000.5f, 4),
-			new Product("VW", "grey", 3000.5f, 4),
-			new Product("Dacia", "white", 2000.5f, 4)));
+	@Autowired
+	private ICRUDProductService CRUDservice;
 	
 	@GetMapping("/hello") //localhost:8080/hello
 	public String getHelloFunc() {
@@ -40,38 +41,35 @@ public class FirstController {
 	
 	@GetMapping("/all-products")//localhost:8080/one-product
 	public String getAllProductFunc(Model model) {
-		model.addAttribute("packet", allProducts);
+		model.addAttribute("packet", CRUDservice.getProducts());
 		return "all-products-page";//will show all-products-page.html
 	}
 	
 	@GetMapping("/all-products-find")//localhost:8080/one-product
 	public String findProducts (@RequestParam("id") long id, Model model) {
-		if(id>0) {
-			for(Product temp : allProducts) {
-				if(temp.getId() == id) {
-					model.addAttribute("packet", temp);
-					return "one-product-page";
-				}
-			}
+		try{
+			Product prod = CRUDservice.getProductById(id);
+			model.addAttribute("packet", prod);
+			return "one-product-page";
 		}
-		
-		model.addAttribute("packetError", "Wrong ID");
-		return "error-page";//will show error-page.html
+		catch(Exception e){
+			model.addAttribute("packetError", "Wrong ID");
+			return "error-page";//will show error-page.html
+		}
 	}
 	
 	@GetMapping("/all-products/{id}")//localhost:8080/one-product
 	public String findProductsById (@PathVariable("id") long id, Model model) {
-		if(id>0) {
-			for(Product temp : allProducts) {
-				if(temp.getId() == id) {
-					model.addAttribute("packet", temp);
-					return "one-product-page";
-				}
-			}
+		try{
+			Product prod = CRUDservice.getProductById(id);
+			model.addAttribute("packet", prod);
+			return "one-product-page";
 		}
-		
-		model.addAttribute("packetError", "Wrong ID");
-		return "error-page";//will show error-page.html
+		catch(Exception e){
+			model.addAttribute("packetError", "Wrong ID");
+			e.printStackTrace();
+			return "error-page";//will show error-page.html
+		}
 	}
 
 	@GetMapping("/add-product")
@@ -82,15 +80,20 @@ public class FirstController {
 	
 	@PostMapping("/add-product")
 	public String postAddProductFunc(Product product) {
-		Product newProduct = new Product(product.getTitle(), product.getDescription(), product.getPrice(), product.getQuantity());
-		allProducts.add(newProduct);
-		return "redirect:/all-products";
+		try {
+			CRUDservice.addNewProduct(product.getTitle(), product.getDescription(), product.getPrice(), product.getQuantity());
+			return "redirect:/all-products";
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return "error-page";//will show error-page.html
+		}
 	}
 	
 	@GetMapping("/edit-product/{id}")
 	public String editProductsById (@PathVariable("id") long id, Model model) {
 		if(id>0) {
-			for(Product temp : allProducts) {
+			for(Product temp : CRUDservice.getProducts()) {
 				if(temp.getId() == id) {
 					model.addAttribute("product", temp);
 					return "edit-product-page";
@@ -103,17 +106,17 @@ public class FirstController {
 	}
 	
 	@PostMapping("/edit-product/{id}")
-	public String postEditProductFunc(@PathVariable("id") long id, Product product) {
-		for(Product temp : allProducts) {
-			if(temp.getId() == id) {
-				temp.setTitle(product.getTitle());
-				temp.setDescription(product.getDescription());
-				temp.setPrice(product.getPrice());
-				temp.setQuantity(product.getQuantity());
-				return "redirect:/all-products/" + id;
-			}
+	public String postEditProductFunc(@PathVariable("id") long id, Product product){
+		
+		try {
+			CRUDservice.updateById(id, product.getTitle(), product.getDescription(), product.getPrice(), product.getQuantity());
+			return "redirect:/all-products/" + id;
 		}
-		return "redirect:/error";
+		catch(Exception e){
+			e.printStackTrace();
+			return "redirect:/error";
+		}
+		
 	}
 	
 	@GetMapping("/error")
@@ -123,17 +126,17 @@ public class FirstController {
 	}
 	
 	@GetMapping("/delete-product/{id}")
-	public String getDeleteProductFunc(@PathVariable("id") long id, Model model) {
-		if(id>0) {
-			for(Product temp : allProducts) {
-				if(temp.getId() == id) {
-					allProducts.remove(temp);
-					model.addAttribute("packet", allProducts);
-					return "/all-products-page";
-				}
-			}
+	public String getDeleteProductFunc(@PathVariable("id") long id, Model model){
+		
+		try {
+		CRUDservice.deleteById(id);
+		
+		return "/all-products-page";
 		}
-		model.addAttribute("packetError", "Wrong ID at delete");
-		return "error-page";//will show error-page.html
+		catch(Exception e) {
+			model.addAttribute("packetError", "Wrong ID at delete");
+			e.printStackTrace();
+			return "error-page";//will show error-page.html
+		}
 	}
 }

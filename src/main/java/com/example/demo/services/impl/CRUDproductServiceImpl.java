@@ -88,7 +88,6 @@ public class CRUDproductServiceImpl implements ICRUDProductService {
 	public void deleteById(long id) throws Exception {
 		Product deletedProduct = getProductById(id);
 		allProducts.remove(deletedProduct);
-		
 	}
 	
 }
