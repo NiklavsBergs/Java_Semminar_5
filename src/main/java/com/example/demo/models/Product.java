@@ -1,9 +1,16 @@
 package com.example.demo.models;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+
 public class Product {
+	@NotNull
+	@Pattern(regexp = "[A-Z]{1} [a-z\\ ]+")
 	private String title;
 	private String description;
+	
 	private float price;
+	
 	private int quantity;
 	private long id;
 	
