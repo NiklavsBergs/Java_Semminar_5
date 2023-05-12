@@ -3,6 +3,7 @@ package com.example.demo.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.demo.models.Product;
 import com.example.demo.services.ICRUDProductService;
+
+import jakarta.validation.Valid;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,14 +82,19 @@ public class FirstController {
 	}
 	
 	@PostMapping("/add-product")
-	public String postAddProductFunc(Product product) {
-		try {
-			CRUDservice.addNewProduct(product.getTitle(), product.getDescription(), product.getPrice(), product.getQuantity());
-			return "redirect:/all-products";
+	public String postAddProductFunc(@Valid Product product, BindingResult result) {
+		if(!result.hasErrors()) {
+			try {
+				CRUDservice.addNewProduct(product.getTitle(), product.getDescription(), product.getPrice(), product.getQuantity());
+				return "redirect:/all-products";
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+				return "error-page";//will show error-page.html
+			}
 		}
-		catch(Exception e) {
-			e.printStackTrace();
-			return "error-page";//will show error-page.html
+		else {
+			return "add-product-page";
 		}
 	}
 	
