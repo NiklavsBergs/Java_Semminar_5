@@ -3,58 +3,48 @@ package com.example.demo.services.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.models.Product;
+import com.example.demo.repos.IProductRepo;
 import com.example.demo.services.ICRUDProductService;
 
 @Service
 public class CRUDproductServiceImpl implements ICRUDProductService {
-
 	
-	private ArrayList<Product> allProducts = new ArrayList<>(Arrays.asList(
-			new Product("Opel", "black", 1000.5f, 4),
-			new Product("VW", "grey", 3000.5f, 4),
-			new Product("Dacia", "white", 2000.5f, 4)));
+	@Autowired
+	private IProductRepo productRepo;
 	
 	@Override
 	public void addNewProduct(String title, String description, float price, int quantity) throws Exception {
-		//TODO verify title and desc with regex
-		if(title!=null && description!=null && price>0 && price < 10000 && quantity>0 && quantity<100000) {
-			boolean isFound = false;
-			for(Product product : allProducts) {
-				if(product.getTitle().equals(title) && product.getDescription().equals(description) && product.getPrice()==price) {
-					product.setQuantity(product.getQuantity() + quantity);
-					isFound = true;
-					break;
-				}
+			
+			if(productRepo.existsByTitleAndDescriptionAndPrice(title, description, price)) {
+				Product temp = productRepo.findByTitleAndDescriptionAndPrice(title, description, price);
+				temp.setQuantity(temp.getQuantity() + quantity);
+				productRepo.save(temp);	
 			}
-			if(!isFound) {
+			else {
 				Product newProduct = new Product(title, description, price, quantity);
-				allProducts.add(newProduct);
-				
+				productRepo.save(newProduct);		
 			}
-		}
-		else {
-			throw new Exception("Incorrect parameters");
-		}
-		
 	}
 
 	@Override
 	public ArrayList<Product> getProducts() {
-		return allProducts;
+		return (ArrayList<Product>) productRepo.findAll();
 	}
 
 	@Override
 	public Product getProductById(long id) throws Exception {
 		if(id>0) {
-			for(Product product : allProducts) {
-				if(product.getId()==id) {
-					return product;
-				}
+			if(productRepo.existsById(id)) {
+				Product temp = productRepo.findById(id).get();
+				return temp;
 			}
-			throw new Exception("Product with this id not found");
+			else {
+				throw new Exception("Product with this id not found");
+			}
 		}
 		else {
 			throw new Exception("Incorrect id");
@@ -64,17 +54,16 @@ public class CRUDproductServiceImpl implements ICRUDProductService {
 	@Override
 	public void updateById(long id, String title, String description, float price, int quantity) throws Exception {
 		if(id>0) {
-			boolean isFound = false;
-			for(Product product : allProducts) {
-				if(product.getId()==id) {
-					product.setTitle(title);
-					product.setDescription(description);
-					product.setPrice(price);
-					product.setQuantity(quantity);
-					isFound = true;
-				}
+			
+			if(productRepo.existsById(id)) {
+				Product temp = productRepo.findById(id).get();
+				temp.setTitle(title);
+				temp.setDescription(description);
+				temp.setPrice(price);
+				temp.setQuantity(quantity);
+				productRepo.save(temp);	
 			}
-			if(!isFound) {
+			else {
 				throw new Exception("Product with this id not found");	
 			}
 		}
@@ -86,8 +75,12 @@ public class CRUDproductServiceImpl implements ICRUDProductService {
 
 	@Override
 	public void deleteById(long id) throws Exception {
-		Product deletedProduct = getProductById(id);
-		allProducts.remove(deletedProduct);
+		if(productRepo.existsById(id)) {
+			productRepo.deleteById(id);
+		}
+		else {
+			throw new Exception("No product with this id");
+		}
 	}
 	
 }
