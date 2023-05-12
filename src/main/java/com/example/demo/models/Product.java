@@ -1,26 +1,36 @@
 package com.example.demo.models;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+@Table(name = "product_table")
+@Entity
 public class Product {
+	
+	@Column(name = "Title")
 	@NotNull
 	@Pattern(regexp = "[A-Z]{1}[a-z\\ ]+", message = "Only latin letters")
 	@Size(min = 3, max = 130)
 	private String title;
 	
+	@Column(name = "Description")
 	@NotNull
 	@Size(min = 5, max = 400)
 	@Pattern(regexp = "[A-Z]{1}[a-z0-9A-Z\\ ]+", message = "Wrong input")
 	private String description;
 	
+	@Column(name = "Price")
 	@Min(0)
 	@Max(10000)
 	private float price;
 	
+	@Column(name = "Quantity")
 	@Min(0)
 	@Max(1000000)
 	private int quantity;
