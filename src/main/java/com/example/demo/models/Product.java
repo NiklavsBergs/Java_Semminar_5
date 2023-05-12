@@ -8,13 +8,13 @@ import jakarta.validation.constraints.Size;
 
 public class Product {
 	@NotNull
-	@Pattern(regexp = "[A-Z]{1} [a-z\\ ]+")
+	@Pattern(regexp = "[A-Z]{1}[a-z\\ ]+", message = "Only latin letters")
 	@Size(min = 3, max = 130)
 	private String title;
 	
 	@NotNull
 	@Size(min = 5, max = 400)
-	@Pattern(regexp = "[A-Z]{1} [a-z0-9A-Z\\ ]+")
+	@Pattern(regexp = "[A-Z]{1}[a-z0-9A-Z\\ ]+", message = "Wrong input")
 	private String description;
 	
 	@Min(0)

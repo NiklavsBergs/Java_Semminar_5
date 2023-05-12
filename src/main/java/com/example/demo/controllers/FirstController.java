@@ -114,15 +114,19 @@ public class FirstController {
 	}
 	
 	@PostMapping("/edit-product/{id}")
-	public String postEditProductFunc(@PathVariable("id") long id, Product product){
-		
-		try {
-			CRUDservice.updateById(id, product.getTitle(), product.getDescription(), product.getPrice(), product.getQuantity());
-			return "redirect:/all-products/" + id;
+	public String postEditProductFunc(@PathVariable("id") long id, @Valid Product product, BindingResult result){
+		if(!result.hasErrors()) {
+			try {
+				CRUDservice.updateById(id, product.getTitle(), product.getDescription(), product.getPrice(), product.getQuantity());
+				return "redirect:/all-products/" + id;
+			}
+			catch(Exception e){
+				e.printStackTrace();
+				return "redirect:/error";
+			}
 		}
-		catch(Exception e){
-			e.printStackTrace();
-			return "redirect:/error";
+		else {
+			return "edit-product-page";
 		}
 		
 	}
